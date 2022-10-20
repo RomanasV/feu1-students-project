@@ -2,9 +2,11 @@ let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'))
 let studentForm = document.querySelector('#student-form');
 let studentsList = document.querySelector('#students-list');
 
-localStorageStudentsData.map(student => {
-  renderSingleStudent(student);
-})
+if (localStorageStudentsData) {
+  localStorageStudentsData.map(student => {
+    renderSingleStudent(student);
+  })
+}
 
 function renderSingleStudent(data) {
   let name = data.name;
