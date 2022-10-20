@@ -8,17 +8,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- <form>
-    <input type="text" name="name" id="name">
-    <input name="age" type="number" min="5" placeholder="Enter your age" step="1">
-    <input name="checkbox" type="checkbox" checked>
-    <input name="radio" type="radio" checked>
-    <input name="user-color" type="color" value="#ff0000">
-    <input name="birthdate" type="date">
-    <input name="pass" type="password" maxlength="20" minlength="10" placeholder="Enter your password">
-    <input name="range" type="range">
-    <input name="submit" type="submit" value="Form Submit">
-  </form> -->
+  <h1>Hello again</h1>
 
   <form id="search-form">
     <input type="text" name="search" id="search-input">
@@ -34,49 +24,38 @@
     <input type="submit" value="Search">
   </form>
 
-  <!-- Sukurti kontaktų formą.
-  1. Kontaktų formoje turi būti šie laukeliai:-->
-
   <form id="student-form" novalidate>
-    <!-- 1. Tekstinis laukelis vardui (privalomas). -->
     <div class="form-control">
       <label for="student-name">Name:</label>
       <input type="text" name="name" id="student-name" placeholder="Enter your name" value="John" class="required">
     </div>
 
-    <!-- 2. Tekstinis laukelis pavardei (privalomas). -->
     <div class="form-control">
       <label for="student-surname">Surname:</label>
       <input type="text" name="surname" id="student-surname" placeholder="Enter your surname" value="Joe" class="required">
     </div>
 
-    <!-- 3. Skaičiaus laukelis amžiui (privalomas). -->
     <div class="form-control">
       <label for="student-age">Age:</label>
       <input type="number" name="age" id="student-age" placeholder="Enter your age" value="30" class="required">
     </div>
 
-    <!-- 4. Laukelis įvesti telefono numerį (neprivalomas). -->
     <div class="form-control">
       <label for="student-phone">Phone:</label>
       <input type="tel" name="phone" id="student-phone" placeholder="Enter your phone" value="+37046464644" class="required">
     </div>
 
-    <!-- 5. Laukelis įvesti el. paštą (privalomas). -->
     <div class="form-control">
       <label for="student-email">Email:</label>
       <input type="email" name="email" id="student-email" placeholder="Enter your email" value="johndoe@johndoe.com" class="required">
     </div>
 
-    <!-- 6. Range tipo laukelis, kuris skirtas įvertinti savo IT žinias nuo 1 iki 10. Galimas vertinimas tik sveikiems skaičiams. -->
     <div class="form-control">
       <label for="student-it-knowledge">IT Knowledge:</label>
       <input type="range" name="it-knowledge" id="student-it-knowledge" min="1" max="10">
       <output id="it-knowledge-output">5</output>
     </div>
     
-    <!-- 7. Radio tipo laukeliai, kuriuose pasirenkamas grupės numeris. Turi būti galimybė pasirinkti grupes nuo FEU 1gr. iki FEU 5gr. -->
-
     <fieldset>
       <legend>Pick your group:</legend>
 
@@ -134,8 +113,6 @@
         <label for="interest5">Node.js</label>
       </div>
     </fieldset>
-
-    <!-- 4. Formoje pridėti „checkbox" tipo input'ą, kuriame pateikta galimybę rinktis iš dominančių programavimo kalbų. -->
 
     <input type="submit" value="Create Student">
   </form>
