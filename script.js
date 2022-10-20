@@ -1,3 +1,4 @@
+console.log('veikia');
 let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
 let studentForm = document.querySelector('#student-form');
 let studentsList = document.querySelector('#students-list');
