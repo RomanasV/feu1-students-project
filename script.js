@@ -1,14 +1,4 @@
-let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
-let studentForm = document.querySelector('#student-form');
-let studentsList = document.querySelector('#students-list');
-
-if (localStorageStudentsData) {
-  localStorageStudentsData.map(student => {
-    renderSingleStudent(student);
-  })
-}
-
-function renderSingleStudent(data) {
+function renderSingleStudent(data, studentsList) {
   let name = data.name;
   let surname = data.surname;
   let age = data.age;
@@ -103,62 +93,6 @@ function changeRangeOutput() {
   });
 }
 
-changeRangeOutput();
-
-studentForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  
-  let elements = event.target.elements;
-
-  let name = elements.name.value;
-  let surname = elements.surname.value;
-  let age = elements.age.value;
-  let phone = elements.phone.value;
-  let email = elements.email.value;
-  let itKnowledge = elements['it-knowledge'].value;
-  let group = elements.group.value;
-  let interests = document.querySelectorAll('[name="interest"]:checked');
-
-  let interestValues = [...interests].map(interest => interest.value);
-
-  let createdStudent = {
-    name,
-    surname,
-    age,
-    email,
-    phone,
-    itKnowledge,
-    group,
-    interests: interestValues,
-  }
-
-  let formIsValid = formValidation(event.target);
-  if (!formIsValid) {
-    return;
-  }
-
-  renderSingleStudent(createdStudent);
-
-  let createdStudentText = `Student created (${name} ${surname})`;
-  renderAlertMessage(createdStudentText);
-
-  event.target.reset();
-
-  let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
-  let studentsDataArray = localStorageStudentsData ? localStorageStudentsData : [];
-  studentsDataArray.push(createdStudent);
-  localStorage.setItem('students-data', JSON.stringify(studentsDataArray));
-
-  localStorage.removeItem('name');
-  localStorage.removeItem('surname');
-  localStorage.removeItem('age');
-  localStorage.removeItem('phone');
-  localStorage.removeItem('email');
-  localStorage.removeItem('it-knowledge');
-  localStorage.removeItem('group');
-  localStorage.removeItem('interest');
-});
-
 function renderAlertMessage(text, elementClass) {
   let alertMessage = document.querySelector('#alert-message');
   alertMessage.textContent = text;
@@ -180,15 +114,6 @@ function checkInputData(input, text) {
   input.after(inputErrorMessage);
   inputErrorMessage.textContent = text;
 }
-
-let nameInput = document.getElementById('student-name');
-let surnameInput = document.getElementById('student-surname');
-let ageInput = document.getElementById('student-age');
-let phoneInput = document.getElementById('student-phone');
-let emailInput = document.getElementById('student-email');
-let itKnowledgeInput = document.getElementById('student-it-knowledge');
-let groupInputs = document.querySelectorAll('[name="group"]');
-let interestInputs = document.querySelectorAll('[name="interest"]');
 
 function formDataInLocalStorage(form) {
   let localName = localStorage.getItem('name');
@@ -261,8 +186,6 @@ function formDataInLocalStorage(form) {
   })
 }
 
-formDataInLocalStorage(studentForm);
-
 function filterStudents() {
   let searchForm = document.querySelector('#search-form');
   searchForm.addEventListener('submit', (event) => {
@@ -297,8 +220,6 @@ function filterStudents() {
     });
   })
 }
-
-filterStudents();
 
 function formValidation(form) {
   let formIsValid = true;
@@ -352,3 +273,75 @@ function formValidation(form) {
 
   return formIsValid;
 }
+
+function init() {
+  let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
+  let studentForm = document.querySelector('#student-form');
+  let studentsList = document.querySelector('#students-list');
+  
+  if (localStorageStudentsData) {
+    localStorageStudentsData.map(student => {
+      renderSingleStudent(student, studentsList);
+    })
+  }
+  
+  studentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    
+    let elements = event.target.elements;
+  
+    let name = elements.name.value;
+    let surname = elements.surname.value;
+    let age = elements.age.value;
+    let phone = elements.phone.value;
+    let email = elements.email.value;
+    let itKnowledge = elements['it-knowledge'].value;
+    let group = elements.group.value;
+    let interests = document.querySelectorAll('[name="interest"]:checked');
+  
+    let interestValues = [...interests].map(interest => interest.value);
+  
+    let createdStudent = {
+      name,
+      surname,
+      age,
+      email,
+      phone,
+      itKnowledge,
+      group,
+      interests: interestValues,
+    }
+  
+    let formIsValid = formValidation(event.target);
+    if (!formIsValid) {
+      return;
+    }
+  
+    renderSingleStudent(createdStudent, studentsList);
+  
+    let createdStudentText = `Student created (${name} ${surname})`;
+    renderAlertMessage(createdStudentText);
+  
+    event.target.reset();
+  
+    let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
+    let studentsDataArray = localStorageStudentsData ? localStorageStudentsData : [];
+    studentsDataArray.push(createdStudent);
+    localStorage.setItem('students-data', JSON.stringify(studentsDataArray));
+  
+    localStorage.removeItem('name');
+    localStorage.removeItem('surname');
+    localStorage.removeItem('age');
+    localStorage.removeItem('phone');
+    localStorage.removeItem('email');
+    localStorage.removeItem('it-knowledge');
+    localStorage.removeItem('group');
+    localStorage.removeItem('interest');
+  });
+  
+  changeRangeOutput();
+  filterStudents();
+  formDataInLocalStorage(studentForm);
+}
+
+init();
