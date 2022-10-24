@@ -1,14 +1,4 @@
-let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
-let studentForm = document.querySelector('#student-form');
-let studentsList = document.querySelector('#students-list');
-
-if (localStorageStudentsData) {
-  localStorageStudentsData.map(student => {
-    renderSingleStudent(student);
-  })
-}
-
-function renderSingleStudent(data) {
+function renderSingleStudent(data, studentsList) {
   let name = data.name;
   let surname = data.surname;
   let age = data.age;
@@ -103,40 +93,140 @@ function changeRangeOutput() {
   });
 }
 
-changeRangeOutput();
+function renderAlertMessage(text, elementClass) {
+  let alertMessage = document.querySelector('#alert-message');
+  alertMessage.textContent = text;
 
-studentForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  
-  let elements = event.target.elements;
-
-  let name = elements.name.value;
-  let surname = elements.surname.value;
-  let age = elements.age.value;
-  let phone = elements.phone.value;
-  let email = elements.email.value;
-  let itKnowledge = elements['it-knowledge'].value;
-  let group = elements.group.value;
-  let interests = document.querySelectorAll('[name="interest"]:checked');
-
-  let interestValues = [...interests].map(interest => interest.value);
-
-  let createdStudent = {
-    name,
-    surname,
-    age,
-    email,
-    phone,
-    itKnowledge,
-    group,
-    interests: interestValues,
+  if (elementClass) {
+    alertMessage.classList.add(elementClass);
   }
 
-  let inputErrorMessages = event.target.querySelectorAll('.input-error-message');
+  setTimeout(() => {
+    alertMessage.textContent = '';
+    alertMessage.classList.remove(elementClass);
+  }, 5000);
+}
+
+function checkInputData(input, text) {
+  let inputErrorMessage = document.createElement('span');
+  inputErrorMessage.classList.add('input-error-message', 'color-red');
+  input.classList.add('input-error');
+  input.after(inputErrorMessage);
+  inputErrorMessage.textContent = text;
+}
+
+function formDataInLocalStorage(form) {
+  let localName = localStorage.getItem('name');
+  let localSurname = localStorage.getItem('surname');
+  let localAge = localStorage.getItem('age');
+  let localPhone = localStorage.getItem('phone');
+  let localEmail = localStorage.getItem('email');
+  let localItKnowledge = localStorage.getItem('it-knowledge');
+  let localGroup = localStorage.getItem('group');
+  let localInterests = JSON.parse(localStorage.getItem('interest'));
+
+  let nameInput = form.elements.name;
+  let surnameInput = form.elements.surname;
+  let ageInput = form.elements.age;
+  let phoneInput = form.elements.phone;
+  let emailInput = form.elements.email;
+  let itKnowledgeInput = form.elements['it-knowledge'];
+  let groupInput = form.elements.group;
+
+  if (localName) {
+    nameInput.value = localName;
+  }
+
+  if (localSurname) {
+    surnameInput.value = localSurname;
+  }
+
+  if (localAge) {
+    ageInput.value = localAge;
+  }
+
+  if (localPhone) {
+    phoneInput.value = localPhone;
+  }
+
+  if (localEmail) {
+    emailInput.value = localEmail;
+  }
+
+  if (localItKnowledge) {
+    itKnowledgeInput.value = localItKnowledge;
+  }
+
+  if (localGroup) {
+    groupInput.value = localGroup;
+  }
+
+  if (localInterests) {
+    localInterests.map(interestValue => {
+      let interestElement = document.querySelector(`[value="${interestValue}"]`);
+      if (interestElement) {
+        interestElement.checked = true;
+      }
+    });
+  }
+
+  form.addEventListener('input', (event) => {
+    let activeInput = event.target;
+    let inputName = activeInput.name;
+    let inputValue = activeInput.value;
+
+    localStorage.setItem(inputName, inputValue);
+
+    let formInterests = document.querySelectorAll('[name="interest"]:checked');
+    let interestValues = [];
+    formInterests.forEach(interest => {
+      interestValues.push(interest.value);
+    });
+    localStorage.setItem('interest', JSON.stringify(interestValues));
+  })
+}
+
+function filterStudents() {
+  let searchForm = document.querySelector('#search-form');
+  searchForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    let searchInput = event.target.elements.search.value.toLowerCase();
+    let searchVariations = event.target.elements.variations.value;
+    let allStudents = document.querySelectorAll('.student-item');
+    allStudents.forEach(student => {
+      let studentName = student.querySelector('.student-name').textContent.toLowerCase();
+      let studentSurname = student.querySelector('.student-surname').textContent.toLowerCase();
+      let studentGroup = student.querySelector('.student-group').textContent.toLowerCase();
+      let studentAge = student.querySelector('.student-age').textContent;
+      let studentItKnowledge = student.querySelector('.student-it-knowledge').textContent;
+
+      let displayStr = '';
+
+      if (searchVariations === 'name' && studentName.includes(searchInput)) {
+        displayStr = 'block';
+      } else if (searchVariations === 'surname' && studentSurname.includes(searchInput)) {
+        displayStr = 'block';
+      } else if (searchVariations === 'group' && studentGroup.includes(searchInput)) {
+        displayStr = 'block';
+      } else if (searchVariations === 'age' && studentAge === searchInput) {
+        displayStr = 'block';
+      } else if (searchVariations === 'it-knowledge' && studentItKnowledge === searchInput) {
+        displayStr = 'block';
+      } else {
+        displayStr = 'none';
+      }
+
+      student.style.display = displayStr;
+    });
+  })
+}
+
+function formValidation(form) {
+  let formIsValid = true;
+  let inputErrorMessages = form.querySelectorAll('.input-error-message');
   inputErrorMessages.forEach(message => message.remove());
 
-  let requiredInputs = event.target.querySelectorAll('.required');
-  let formIsValid = true;
+  let requiredInputs = form.querySelectorAll('.required');
 
   requiredInputs.forEach(input => {
     input.classList.remove('input-error');
@@ -179,148 +269,79 @@ studentForm.addEventListener('submit', (event) => {
   if (!formIsValid) {
     let errorMessage = 'Some fields are missing...';
     renderAlertMessage(errorMessage, 'color-red');
-    return;
   }
 
-  renderSingleStudent(createdStudent);
+  return formIsValid;
+}
 
-  let createdStudentText = `Student created (${name} ${surname})`;
-  renderAlertMessage(createdStudentText);
-
-  event.target.reset();
-
+function init() {
   let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
-  let studentsDataArray = localStorageStudentsData ? localStorageStudentsData : [];
-  studentsDataArray.push(createdStudent);
-  localStorage.setItem('students-data', JSON.stringify(studentsDataArray));
-
-  localStorage.removeItem('name');
-  localStorage.removeItem('surname');
-  localStorage.removeItem('age');
-  localStorage.removeItem('phone');
-  localStorage.removeItem('email');
-  localStorage.removeItem('it-knowledge');
-  localStorage.removeItem('group');
-  localStorage.removeItem('interest');
-});
-
-function renderAlertMessage(text, elementClass) {
-  let alertMessage = document.querySelector('#alert-message');
-  alertMessage.textContent = text;
-
-  if (elementClass) {
-    alertMessage.classList.add(elementClass);
+  let studentForm = document.querySelector('#student-form');
+  let studentsList = document.querySelector('#students-list');
+  
+  if (localStorageStudentsData) {
+    localStorageStudentsData.map(student => {
+      renderSingleStudent(student, studentsList);
+    })
   }
-
-  setTimeout(() => {
-    alertMessage.textContent = '';
-    alertMessage.classList.remove(elementClass);
-  }, 5000);
-}
-
-function checkInputData(input, text) {
-  let inputErrorMessage = document.createElement('span');
-  inputErrorMessage.classList.add('input-error-message', 'color-red');
-  input.classList.add('input-error');
-  input.after(inputErrorMessage);
-  inputErrorMessage.textContent = text;
-}
-
-let nameInput = document.getElementById('student-name');
-let surnameInput = document.getElementById('student-surname');
-let ageInput = document.getElementById('student-age');
-let phoneInput = document.getElementById('student-phone');
-let emailInput = document.getElementById('student-email');
-let itKnowledgeInput = document.getElementById('student-it-knowledge');
-let groupInputs = document.querySelectorAll('[name="group"]');
-let interestInputs = document.querySelectorAll('[name="interest"]');
-
-function formDataInLocalStorage(form) {
-  let localName = localStorage.getItem('name');
-  let localSurname = localStorage.getItem('surname');
-  let localAge = localStorage.getItem('age');
-  let localPhone = localStorage.getItem('phone');
-  let localEmail = localStorage.getItem('email');
-  let localItKnowledge = localStorage.getItem('it-knowledge');
-  let localGroup = localStorage.getItem('group');
-  let localInterests = JSON.parse(localStorage.getItem('interest'));
-
-  let nameInput = form.elements.name;
-  let surnameInput = form.elements.surname;
-  let ageInput = form.elements.age;
-  let phoneInput = form.elements.phone;
-  let emailInput = form.elements.email;
-  let itKnowledgeInput = form.elements['it-knowledge'];
-  let groupInput = form.elements.group;
-
-  nameInput.value = localName;
-  surnameInput.value = localSurname;
-  ageInput.value = localAge;
-  phoneInput.value = localPhone;
-  emailInput.value = localEmail;
-  itKnowledgeInput.value = localItKnowledge;
-  groupInput.value = localGroup;
-
-  if (localInterests) {
-    localInterests.map(interestValue => {
-      let interestElement = document.querySelector(`[value="${interestValue}"]`);
-      if (interestElement) {
-        interestElement.checked = true;
-      }
-    });
-  }
-
-  form.addEventListener('input', (event) => {
-    let activeInput = event.target;
-    let inputName = activeInput.name;
-    let inputValue = activeInput.value;
-
-    localStorage.setItem(inputName, inputValue);
-
-    let formInterests = document.querySelectorAll('[name="interest"]:checked');
-    let interestValues = [];
-    formInterests.forEach(interest => {
-      interestValues.push(interest.value);
-    });
-    localStorage.setItem('interest', JSON.stringify(interestValues));
-  })
-}
-
-formDataInLocalStorage(studentForm);
-
-function filterStudents() {
-  let searchForm = document.querySelector('#search-form');
-  searchForm.addEventListener('submit', (event) => {
+  
+  studentForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    let searchInput = event.target.elements.search.value.toLowerCase();
-    let searchVariations = event.target.elements.variations.value;
-    let allStudents = document.querySelectorAll('.student-item');
-    allStudents.forEach(student => {
-      let studentName = student.querySelector('.student-name').textContent.toLowerCase();
-      let studentSurname = student.querySelector('.student-surname').textContent.toLowerCase();
-      let studentGroup = student.querySelector('.student-group').textContent.toLowerCase();
-      let studentAge = student.querySelector('.student-age').textContent;
-      let studentItKnowledge = student.querySelector('.student-it-knowledge').textContent;
-
-      let displayStr = '';
-
-      if (searchVariations === 'name' && studentName.includes(searchInput)) {
-        displayStr = 'block';
-      } else if (searchVariations === 'surname' && studentSurname.includes(searchInput)) {
-        displayStr = 'block';
-      } else if (searchVariations === 'group' && studentGroup.includes(searchInput)) {
-        displayStr = 'block';
-      } else if (searchVariations === 'age' && studentAge === searchInput) {
-        displayStr = 'block';
-      } else if (searchVariations === 'it-knowledge' && studentItKnowledge === searchInput) {
-        displayStr = 'block';
-      } else {
-        displayStr = 'none';
-      }
-
-      student.style.display = displayStr;
-    });
-  })
+    
+    let elements = event.target.elements;
+  
+    let name = elements.name.value;
+    let surname = elements.surname.value;
+    let age = elements.age.value;
+    let phone = elements.phone.value;
+    let email = elements.email.value;
+    let itKnowledge = elements['it-knowledge'].value;
+    let group = elements.group.value;
+    let interests = document.querySelectorAll('[name="interest"]:checked');
+  
+    let interestValues = [...interests].map(interest => interest.value);
+  
+    let createdStudent = {
+      name,
+      surname,
+      age,
+      email,
+      phone,
+      itKnowledge,
+      group,
+      interests: interestValues,
+    }
+  
+    let formIsValid = formValidation(event.target);
+    if (!formIsValid) {
+      return;
+    }
+  
+    renderSingleStudent(createdStudent, studentsList);
+  
+    let createdStudentText = `Student created (${name} ${surname})`;
+    renderAlertMessage(createdStudentText);
+  
+    event.target.reset();
+  
+    let localStorageStudentsData = JSON.parse(localStorage.getItem('students-data'));
+    let studentsDataArray = localStorageStudentsData ? localStorageStudentsData : [];
+    studentsDataArray.push(createdStudent);
+    localStorage.setItem('students-data', JSON.stringify(studentsDataArray));
+  
+    localStorage.removeItem('name');
+    localStorage.removeItem('surname');
+    localStorage.removeItem('age');
+    localStorage.removeItem('phone');
+    localStorage.removeItem('email');
+    localStorage.removeItem('it-knowledge');
+    localStorage.removeItem('group');
+    localStorage.removeItem('interest');
+  });
+  
+  changeRangeOutput();
+  filterStudents();
+  formDataInLocalStorage(studentForm);
 }
 
-filterStudents();
+init();
