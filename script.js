@@ -208,13 +208,33 @@ function formDataInLocalStorage(form) {
   let itKnowledgeInput = form.elements['it-knowledge'];
   let groupInput = form.elements.group;
 
-  nameInput.value = localName;
-  surnameInput.value = localSurname;
-  ageInput.value = localAge;
-  phoneInput.value = localPhone;
-  emailInput.value = localEmail;
-  itKnowledgeInput.value = localItKnowledge;
-  groupInput.value = localGroup;
+  if (localName) {
+    nameInput.value = localName;
+  }
+
+  if (localSurname) {
+    surnameInput.value = localSurname;
+  }
+
+  if (localAge) {
+    ageInput.value = localAge;
+  }
+
+  if (localPhone) {
+    phoneInput.value = localPhone;
+  }
+
+  if (localEmail) {
+    emailInput.value = localEmail;
+  }
+
+  if (localItKnowledge) {
+    itKnowledgeInput.value = localItKnowledge;
+  }
+
+  if (localGroup) {
+    groupInput.value = localGroup;
+  }
 
   if (localInterests) {
     localInterests.map(interestValue => {
