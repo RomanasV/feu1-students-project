@@ -132,53 +132,8 @@ studentForm.addEventListener('submit', (event) => {
     interests: interestValues,
   }
 
-  let inputErrorMessages = event.target.querySelectorAll('.input-error-message');
-  inputErrorMessages.forEach(message => message.remove());
-
-  let requiredInputs = event.target.querySelectorAll('.required');
-  let formIsValid = true;
-
-  requiredInputs.forEach(input => {
-    input.classList.remove('input-error');
-
-    if (!input.value) {
-      formIsValid = false;
-      checkInputData(input, 'This field is required.');
-    } else if (input.name === 'name') {
-      if (input.value.length < 3) {
-        formIsValid = false;
-        let errorText = 'Name is too short. At least 3 symbols is required.'
-        checkInputData(input, errorText);
-      }
-    } else if (input.name === 'surname') {
-      if (input.value.length < 3) {
-        formIsValid = false;
-        checkInputData(input, 'Surname is too short. At least 3 symbols is required.');
-      }
-    } else if (input.name === 'phone') {
-      if (input.value.length < 9 || input.value.length > 12) {
-        formIsValid = false;
-        checkInputData(input, 'Phone number is invalid.');
-      }
-    } else if (input.name === 'age') {
-      if (input.value < 0) {
-        formIsValid = false;
-        checkInputData(input, 'Age cannot be a negative number.');
-      } else if (input.value > 120) {
-        formIsValid = false;
-        checkInputData(input, 'Age cannot be more then 120 years.');
-      }
-    } else if (input.name === 'email') {
-      if (input.value.length < 9 || !input.value.includes('@') || !input.value.includes('.')) {
-        formIsValid = false;
-        checkInputData(input, 'Email is incorrect.');
-      }
-    }
-  });
-
+  let formIsValid = formValidation(event.target);
   if (!formIsValid) {
-    let errorMessage = 'Some fields are missing...';
-    renderAlertMessage(errorMessage, 'color-red');
     return;
   }
 
@@ -324,3 +279,56 @@ function filterStudents() {
 }
 
 filterStudents();
+
+function formValidation(form) {
+  let formIsValid = true;
+  let inputErrorMessages = form.querySelectorAll('.input-error-message');
+  inputErrorMessages.forEach(message => message.remove());
+
+  let requiredInputs = form.querySelectorAll('.required');
+
+  requiredInputs.forEach(input => {
+    input.classList.remove('input-error');
+
+    if (!input.value) {
+      formIsValid = false;
+      checkInputData(input, 'This field is required.');
+    } else if (input.name === 'name') {
+      if (input.value.length < 3) {
+        formIsValid = false;
+        let errorText = 'Name is too short. At least 3 symbols is required.'
+        checkInputData(input, errorText);
+      }
+    } else if (input.name === 'surname') {
+      if (input.value.length < 3) {
+        formIsValid = false;
+        checkInputData(input, 'Surname is too short. At least 3 symbols is required.');
+      }
+    } else if (input.name === 'phone') {
+      if (input.value.length < 9 || input.value.length > 12) {
+        formIsValid = false;
+        checkInputData(input, 'Phone number is invalid.');
+      }
+    } else if (input.name === 'age') {
+      if (input.value < 0) {
+        formIsValid = false;
+        checkInputData(input, 'Age cannot be a negative number.');
+      } else if (input.value > 120) {
+        formIsValid = false;
+        checkInputData(input, 'Age cannot be more then 120 years.');
+      }
+    } else if (input.name === 'email') {
+      if (input.value.length < 9 || !input.value.includes('@') || !input.value.includes('.')) {
+        formIsValid = false;
+        checkInputData(input, 'Email is incorrect.');
+      }
+    }
+  });
+
+  if (!formIsValid) {
+    let errorMessage = 'Some fields are missing...';
+    renderAlertMessage(errorMessage, 'color-red');
+  }
+
+  return formIsValid;
+}
